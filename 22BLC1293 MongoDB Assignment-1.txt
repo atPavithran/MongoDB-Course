@@ -1,0 +1,150 @@
+1)Price should be grater than either 799 or ram is greater than 12
+db.products.find({$or: [{ price: { $gt: 799 } },{ "spec.ram": { $gt: 12 } }]})
+
+2)Find products that do not have "white" as a color and are priced below 800
+db.products.find({color: { $nin: ["white"] },price: { $lt: 800 }})
+
+3)select products with either blue colour and storage not less than 128
+db.products.find({color: "blue","storage": { $gte: 128 }})
+
+4)print the name and date of product whose ram is neither 4 nor the product price is
+db.products.find({$and: [{ "spec.ram": { $ne: 4 } },{ price: { $gte: 799 } }]}, { name: 1, releaseDate: 1 })
+
+5)print the names of products whose screen is either greater than 7 or color is white
+db.products.find({$or: [{ "spec.screen": { $gt: 7 } },{ color: "white" }]}, { name: 1 })
+
+6)print the name , screen size and color of products whose color has no gold in it.
+db.products.find({ color: { $nin: ["gold"] } }, { name: 1, "spec.screen": 1, color: 1 })
+
+7)Find products that have either "white" or "black" as a color option and are priced below 800.
+db.products.find({$or: [{ color: "white" },{ color: "black" }],price: { $lt: 800 }})
+
+8)Find products that do not have "gold" as a color and are priced below 700 or have a storage option of 512GB.
+db.products.find({$and: [{ color: { $nin: ["gold"] } },{ $or: [{ price: { $lt: 700 } },{ storage: { $in: [512] } }] }]})
+
+9)Find products that have both a RAM size greater than 8GB and a CPU speed less than 2 GHz, or do not have a storage option of 256GB.
+db.products.find({$or: [{ $and: [{ "spec.ram": { $gt: 8 } },{ "spec.cpu": { $lt: 2 } }] },{ storage: { $nin: [256] } }]})
+
+10)find name,price,storage if price is 699 or storage is 1024
+db.products.find({$or: [{price: 699},{storage: 1024}]},{name: 1,price: 1,storage: 1 })
+
+11)Find the product cpu is not  less than 3 ,not isodate is ("2011-09-01")
+db.products.find({$and: [{'spec.cpu': {$not: { $lt: 3 } } },{ releaseDate: {$not: {$eq: ISODate("2011-09-01") }}}]})
+
+12)Find the product no color is blue,no price is 899
+db.products.find({$nor: [{color: "blue"},{price: 899}]})
+
+
+Sat Class question
+
+import java.util.ArrayList;
+import org.bson.Document;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.*;
+import com.mongodb.client.model.Filters;
+
+public class Connection_practice {
+    public static void main(String[] args) {
+        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+        MongoDatabase database = mongoClient.getDatabase("Saturday");
+        MongoCollection<Document> collection = database.getCollection("student");
+        collection.drop();
+        Document document1 = new Document("First_Name", "Sai")
+            .append("Last_Name", "kushal")
+            .append("Mark", 90)
+            .append("age", 18);
+        Document document2 = new Document("First_Name", "suneeth")
+            .append("Last_Name", "reddy")
+            .append("Mark", 90)
+            .append("age", 22);
+        Document document3 = new Document("First_Name", "krishna")
+            .append("Last_Name", "kishore")
+            .append("Mark", 91)
+            .append("age", 20);
+        Document document4 = new Document("First_Name", "Prem")
+            .append("Last_Name", "sai")
+            .append("Mark", 89)
+            .append("age", 19);
+        ArrayList<Document> documents = new ArrayList<Document>();
+        documents.add(document1);
+        documents.add(document2);
+        documents.add(document3);
+        documents.add(document4);
+        collection.insertMany(documents);
+        Document highestMark = collection.find().sort(new BasicDBObject("Mark", -1)).first();
+        if (highestMark != null) {
+            int Mark = highestMark.getInteger("Mark");
+            FindIterable<Document> highestMarkStudents = collection.find(Filters.eq("Mark", Mark));
+            System.out.println("Students with the highest mark:");
+            for (Document doc : highestMarkStudents) {
+                System.out.println(doc);
+            }
+        } else {
+            System.out.println("No students found");
+        }
+    }
+}
+
+2nd question-
+import java.util.ArrayList;
+import org.bson.Document;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.*;
+
+public class Assignment_2_2 {
+    public static void main(String[] args) {
+        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+        MongoDatabase database = mongoClient.getDatabase("Saturday");
+
+        MongoCollection<Document> collection = database.getCollection("employee");
+        collection.drop(); // Drop the collection if it exists to start fresh
+
+        Document document1 = new Document("First_Name", "Sai")
+            .append("Last_Name", "Kushal")
+            .append("salary", 18000)
+            .append("age", 30);
+        Document document2 = new Document("First_Name", "Krishna")
+            .append("Last_Name", "Kishore")
+            .append("salary", 21000)
+            .append("age", 35);
+        Document document3 = new Document("First_Name", "Feroz")
+            .append("Last_Name", "shaik")
+            .append("salary", 17000)
+            .append("age", 42);
+        Document document4 = new Document("First_Name", "karthik")
+            .append("Last_Name", "ram")
+            .append("salary", 22000)
+            .append("age", 37);
+        Document document5 = new Document("First_Name", "suneeth")
+                .append("Last_Name", "reddy")
+                .append("salary", 38000)
+                .append("age", 44);
+        Document document6 = new Document("First_Name", "lalith")
+                .append("Last_Name", "sri")
+                .append("salary", 29000)
+                .append("age", 32);
+        ArrayList<Document> documents = new ArrayList<>();
+        documents.add(document1);
+        documents.add(document2);
+        documents.add(document3);
+        documents.add(document4);
+        documents.add(document5);
+        documents.add(document6);
+        collection.insertMany(documents);
+        FindIterable<Document> sortedsalary = collection.find().sort(new BasicDBObject("salary", 1));
+        Document lowestSalary = null;
+        for (Document doc : sortedsalary) {
+            int age = doc.getInteger("age");
+            if (age >= 30 && age <= 40) {
+                lowestSalary = doc;
+                break;
+            }
+        }
+        if (lowestSalary != null) {
+            System.out.println("Employee with the lowest salary in the age range 30 to 40:");
+            System.out.println(lowestSalary.toJson());
+        } else {
+            System.out.println("No employees found");
+        }
+    }
+}
